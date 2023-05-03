@@ -16,7 +16,7 @@ const googleConfig = GoogleProvider({
       prompt: "consent",
       access_type: "offline",
       response_type: "code",
-      scopes: googleSheetsScopes,
+      scope: googleSheetsScopes.join(" "),
     },
   },
 });
