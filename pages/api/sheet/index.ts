@@ -1,21 +1,29 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import { NextApiRequest, NextApiResponse } from "next";
-import { fetchGoogleSheetDocWithAccessToken } from "@/core";
+import {
+  fetchGoogleSheetDocWithAccessToken,
+  parseUrlForSheetID,
+  parseRowsAsList,
+  parseGoogleSheet,
+} from "@/core";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
-
+  const { query } = req;
+  const sheetURL = query["u"];
   if (session) {
     const { accessToken } = session;
-    console.log(accessToken, req, 7788);
-    // await fetchGoogleSheetDocWithAccessToken();
-    res.send({
-      content:
-        "This is protected content. You can access this content because you are signed in.",
-    });
+
+    const sheetID = parseUrlForSheetID(sheetURL);
+    if (!sheetID) throw Error("Erroe ");
+    const doc = await fetchGoogleSheetDocWithAccessToken(sheetID, accessToken);
+    const json = await parseGoogleSheet(doc);
+
+    console.log(doc, 778899);
+    res.send(json);
   } else {
-    res.send({
+    res.status(401).send({
       error:
         "You must be signed in to view the protected content on this page.",
     });
