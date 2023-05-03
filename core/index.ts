@@ -7,6 +7,13 @@ export function parseUrlForSheetID(str?: NonNullable<string>) {
   return str?.match(/spreadsheets\/d\/([^/]+)/)?.[1];
 }
 
+export async function downloadSheetAsCSVString(
+  sheet: GoogleSpreadsheetWorksheet & { downloadAsCSV: () => Buffer }
+) {
+  const buffer = await sheet.downloadAsCSV();
+  return buffer.toString();
+}
+
 export async function parseRowsAsList(sheet: GoogleSpreadsheetWorksheet) {
   const rows = await sheet.getRows();
   await sheet.loadCells();
