@@ -20,7 +20,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const doc = await fetchGoogleSheetDocWithAccessToken(sheetID, accessToken);
     const json = await parseGoogleSheet(doc);
 
-    console.log(doc, 778899);
     res.send(json);
   } else {
     res.status(401).send({

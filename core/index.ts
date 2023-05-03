@@ -1,5 +1,37 @@
-import { GoogleSpreadsheet } from "google-spreadsheet";
+import {
+  GoogleSpreadsheet,
+  GoogleSpreadsheetWorksheet,
+} from "google-spreadsheet";
 
+export function parseUrlForSheetID(str?: NonNullable<string>) {
+  return str?.match(/spreadsheets\/d\/([^/]+)/)?.[1];
+}
+
+export async function parseRowsAsList(sheet: GoogleSpreadsheetWorksheet) {
+  const rows = await sheet.getRows();
+  await sheet.loadCells();
+
+  return rows.map((i) => i._rawData.join(" | "));
+}
+async function parseSheet(
+  sheet: GoogleSpreadsheetWorksheet,
+  type: "list" | "json"
+) {
+  switch (type) {
+    default:
+      return parseRowsAsList(sheet);
+  }
+}
+
+export async function parseGoogleSheet(doc: GoogleSpreadsheet) {
+  const sheet = await parseSheet(doc.sheetsByIndex[0], "list");
+  console.log(sheet, 88);
+  return {
+    sheet_title: doc.title,
+    sheet_id: doc.spreadsheetId,
+    data: sheet,
+  };
+}
 export async function fetchGoogleSheetDocWithAccessToken(
   sheetID: string,
   accessToken: string
